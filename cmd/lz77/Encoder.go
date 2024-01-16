@@ -1,47 +1,59 @@
 package lz77
 
-import lz77 "github.com/rodrigosemicolon/gompress/cmd/LZ77"
+import "fmt"
 
-func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) lz77.CTuple {
-	maxLength := 0
-	matchLength, matchOffset := 0, 0
+func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
+	maxLength, maxOffset := 0, 0
+	matchLength := 0
 	var nextByte byte
-	maxPossible := min(len(searchBuffer), len(lookAheadBuffer))
-	i := 0
-	for i < maxPossible {
+
+	for j := 0; j < len(searchBuffer); j++ {
 		matchLength = 0
-		for j := 0; (i + j) < maxPossible; j++ {
-			if searchBuffer[i+j] == lookAheadBuffer[i+j] {
+		for k := 0; (k < len(lookAheadBuffer)) && (k+j < len(searchBuffer)); k++ {
+			if searchBuffer[j+k] == lookAheadBuffer[k] {
 				matchLength++
-				if matchLength >= maxLength {
-					maxLength = matchLength
-					matchOffset = i
-				}
+				//nextByte = lookAheadBuffer[j+k]
 			} else {
-				i = i + j
-				nextByte = lookAheadBuffer[i+j+1]
 				break
 			}
 		}
+		if matchLength > 0 && matchLength >= maxLength {
+			maxLength = matchLength
+			maxOffset = j
+		}
+
 	}
-	return lz77.CTuple{Offset: matchOffset,
-		Length:   matchLength,
+
+	if maxLength == 0 {
+		nextByte = lookAheadBuffer[0]
+	} else if maxLength < len(lookAheadBuffer) {
+		nextByte = lookAheadBuffer[maxLength]
+	}
+
+	return CTuple{Offset: maxOffset,
+		Length:   maxLength,
 		NextByte: nextByte}
 
 }
 
-/*
-func (c *LZ77) Encode(content []byte) {
-	compressedData := ""
+func (c *LZ77) Encode(content []byte) []CTuple {
+	compressedData := make([]CTuple, 0)
 	i := 0
-	c.LookAheadBuffer = content[i : i+c.Config.LookAheadBuffer]
+	c.LookAheadBuffer = content[:c.Config.LookAheadBuffer]
 	for i < len(content) {
-		matchLength := 0
-		bestMatch := CTuple{}
-
-		c.LookAheadBuffer = content[i+matchLength : i+matchLength+c.Config.LookAheadBuffer]
-		c.SearchBuffer = content[i : i+c.Config.LookAheadBuffer]
+		fmt.Println("search buffer: ", c.SearchBuffer)
+		match := FindLongestMatch(c.SearchBuffer, c.LookAheadBuffer)
+		compressedData = append(compressedData, match)
+		moveFwd := match.Length + 1
+		for _, b := range content[i : i+moveFwd] {
+			c.SearchBuffer = append(c.SearchBuffer, b)
+		}
+		if len(c.SearchBuffer)+moveFwd > c.Config.SearchBuffer {
+			c.SearchBuffer = c.SearchBuffer[moveFwd:]
+		}
+		c.LookAheadBuffer = content[i+moveFwd : i+moveFwd+c.Config.LookAheadBuffer]
+		i = i + moveFwd
 
 	}
+	return compressedData
 }
-*/

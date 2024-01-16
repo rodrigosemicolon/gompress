@@ -37,7 +37,7 @@ func NewLZ77ConfigFromBuffers(searchSize, lookAheadSize int) *LZ77Config {
 
 func NewLZ77(config LZ77Config) *LZ77 {
 	return &LZ77{
-		SearchBuffer:    make([]byte, config.SearchBuffer),
+		SearchBuffer:    make([]byte, 0), //config.SearchBuffer),
 		LookAheadBuffer: make([]byte, config.LookAheadBuffer),
 		Config:          config,
 	}

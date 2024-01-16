@@ -19,8 +19,21 @@ func quicktest() {
 	} else {
 		fmt.Println("error:", *err)
 	}
-	lz77config := lz77.LZ77ConfigFromWindow(10)
-	fmt.Println("lz77:", lz77.NewLZ77(*lz77config))
+	lz77config := lz77.NewLZ77ConfigFromBuffers(6, 4)
+	compressor := lz77.NewLZ77(*lz77config)
+	fmt.Println("lz77:", compressor)
+	//var test_search = []byte{23, 24, 11, 29}
+	//var test_look = []byte{23, 24, 11, 29}
+	//fmt.Println("search:", test_search)
+	//fmt.Println("lookahead:", test_look)
+	//fmt.Println(lz77.FindLongestMatch(test_search, test_look))
+	fmt.Println(cnt)
+	resultEncoding := compressor.Encode(cnt)
+	for idx, tup := range resultEncoding {
+		fmt.Println("idx: ", idx, ",\toffset:", tup.Offset, ",\tlength:", tup.Length, ",\tchar:", string(tup.NextByte))
+
+	}
+
 }
 
 func main() {
