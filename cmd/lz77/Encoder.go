@@ -1,6 +1,8 @@
 package lz77
 
-import "fmt"
+import(
+	//"github.com/rodrigosemicolon/gompress/cmd/utilities"
+)
 
 func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
 	maxLength, maxOffset := 0, 0
@@ -41,22 +43,34 @@ func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
 func (c *LZ77) Encode(content []byte) []CTuple {
 	compressedData := make([]CTuple, 0)
 	i := 0
-	c.LookAheadBuffer = content[:c.Config.LookAheadBuffer]
+	LookAheadBuffer := content[:c.LookAheadBufferSize]
+	SearchBuffer := make([]byte, c.SearchBufferSize)
 	for i < len(content) {
-		fmt.Println("\n\nsearch buffer: ", c.SearchBuffer, "\tlookahead buffer: ", c.LookAheadBuffer)
-		match := FindLongestMatch(c.SearchBuffer, c.LookAheadBuffer)
+		//fmt.Println("\n\nsearch buffer: ", SearchBuffer, "\tlookahead buffer: ", LookAheadBuffer)
+		match := FindLongestMatch(SearchBuffer, LookAheadBuffer)
 		compressedData = append(compressedData, match)
 		moveFwd := match.Length + 1
-		for _, b := range content[i : i+moveFwd] {
-			c.SearchBuffer = append(c.SearchBuffer, b)
+		
+		SearchBuffer = append(SearchBuffer, content[i : i+moveFwd]...)
+		for len(SearchBuffer) > c.SearchBufferSize {
+			SearchBuffer = SearchBuffer[1:]
 		}
-		for len(c.SearchBuffer) > c.Config.SearchBuffer {
-			c.SearchBuffer = c.SearchBuffer[1:]
-		}
-	
-		c.LookAheadBuffer = content[i+moveFwd : i+moveFwd+c.Config.LookAheadBuffer]
 		i = i + moveFwd
-		fmt.Println("match:\n", match.ToString())
+		/*
+		if i > len(content){
+			break
+		} else if i + c.LookAheadBufferSize > len(content){
+			diff := (i + c.LookAheadBufferSize) - len(content) -1
+			LookAheadBuffer = content[i : i+diff]
+		} else{
+			*/
+		
+		print("lookaheadbuffer: ", string(LookAheadBuffer))
+		print("content: ", string(content[i:]))
+		LookAheadBuffer = content[i : i+c.LookAheadBufferSize]
+		//LookAheadBuffer = utilities.SliceWithPadding(LookAheadBuffer, i, i + c.LookAheadBufferSize)	
+		//}
+		//fmt.Println("match:\n", match.ToString())
 	}
 	return compressedData
 }

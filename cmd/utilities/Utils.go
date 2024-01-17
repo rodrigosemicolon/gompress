@@ -1,29 +1,10 @@
 package utilities
 
-import "os"
+import (
+	"os"
+)
 
-type Queue struct {
-	Content  []byte
-	Capacity int
-	Size     int
-}
-
-func NewQueue(capacity int) *Queue {
-	return &Queue{Content: make([]byte, capacity),
-		Capacity: capacity,
-		Size:     0}
-}
-
-func (q *Queue) Enqueue(element byte) {
-	if q.Size < q.Capacity {
-		q.Content = append(q.Content, element)
-	} else {
-		q.Content = append(q.Content[1:], element)
-	}
-	q.Size = q.Size + 1
-}
-
-func GetFileContent(path string) ([]byte, *error) {
+func GetSrcContent(path string) ([]byte, *error) {
 	content, err := os.ReadFile(path)
 
 	if err != nil {
@@ -33,6 +14,8 @@ func GetFileContent(path string) ([]byte, *error) {
 	}
 }
 
+
+
 func SplitEvenly(n int) (int, int) {
 	// Calculate the two split values
 	half := n / 2
@@ -40,4 +23,29 @@ func SplitEvenly(n int) (int, int) {
 
 	// Adjust the split if there's a remainder
 	return half + remainder, half
+}
+
+
+func SliceWithPadding(slice []byte, start, end int) []byte {
+    // Ensure start index is within bounds
+    if start < 0 {
+        start = 0
+    }
+
+    // Ensure end index is within bounds
+    if end > len(slice) {
+        end = len(slice)
+    }
+
+    // Calculate the length of the resulting slice
+    length := end - start
+    if length < 0 {
+        length = 0
+    }
+
+    // Create a new slice with the specified length and fill it with 0's
+    result := make([]byte, length)
+    copy(result, slice[start:end])
+
+    return result
 }

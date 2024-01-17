@@ -8,11 +8,10 @@ func (lz77 *LZ77) Decode(dictionary []CTuple) []byte {
 	for _, tup := range dictionary {
 
 		toAdd := resultArray[len(resultArray) - tup.Offset:len(resultArray) - tup.Offset + tup.Length]
-		for _, b := range toAdd {
-			resultArray = append(resultArray, b)
-		}
-
 		
+		resultArray = append(resultArray, toAdd...)
+
+
 		if tup.NextByte != defaultByte{
 			resultArray = append(resultArray, tup.NextByte)
 
