@@ -29,10 +29,10 @@ func quicktest() {
 	//fmt.Println(lz77.FindLongestMatch(test_search, test_look))
 	fmt.Println(cnt)
 	resultEncoding := compressor.Encode(cnt)
-	for idx, tup := range resultEncoding {
-		fmt.Println("idx: ", idx, ",\toffset:", tup.Offset, ",\tlength:", tup.Length, ",\tchar:", string(tup.NextByte))
-
-	}
+	fmt.Println(resultEncoding)
+	resultDecoding := compressor.Decode(resultEncoding)
+	fmt.Println(cnt, string(cnt))
+	fmt.Println(resultDecoding, string(resultDecoding))
 
 }
 

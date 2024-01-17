@@ -19,7 +19,9 @@ func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
 		}
 		if matchLength > 0 && matchLength >= maxLength {
 			maxLength = matchLength
-			maxOffset = j
+			//maxOffset = j
+			maxOffset = len(searchBuffer) - j
+
 		}
 
 	}
@@ -41,19 +43,20 @@ func (c *LZ77) Encode(content []byte) []CTuple {
 	i := 0
 	c.LookAheadBuffer = content[:c.Config.LookAheadBuffer]
 	for i < len(content) {
-		fmt.Println("search buffer: ", c.SearchBuffer)
+		fmt.Println("\n\nsearch buffer: ", c.SearchBuffer, "\tlookahead buffer: ", c.LookAheadBuffer)
 		match := FindLongestMatch(c.SearchBuffer, c.LookAheadBuffer)
 		compressedData = append(compressedData, match)
 		moveFwd := match.Length + 1
 		for _, b := range content[i : i+moveFwd] {
 			c.SearchBuffer = append(c.SearchBuffer, b)
 		}
-		if len(c.SearchBuffer)+moveFwd > c.Config.SearchBuffer {
-			c.SearchBuffer = c.SearchBuffer[moveFwd:]
+		for len(c.SearchBuffer) > c.Config.SearchBuffer {
+			c.SearchBuffer = c.SearchBuffer[1:]
 		}
+	
 		c.LookAheadBuffer = content[i+moveFwd : i+moveFwd+c.Config.LookAheadBuffer]
 		i = i + moveFwd
-
+		fmt.Println("match:\n", match.ToString())
 	}
 	return compressedData
 }

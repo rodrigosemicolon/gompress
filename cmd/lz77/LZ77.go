@@ -1,6 +1,9 @@
 package lz77
 
-import "github.com/rodrigosemicolon/gompress/cmd/utilities"
+import (
+	"github.com/rodrigosemicolon/gompress/cmd/utilities"
+	"strconv"
+)
 
 type CTuple struct {
 	Offset   int
@@ -41,4 +44,8 @@ func NewLZ77(config LZ77Config) *LZ77 {
 		LookAheadBuffer: make([]byte, config.LookAheadBuffer),
 		Config:          config,
 	}
+}
+
+func (t *CTuple) ToString() string{
+	return "offset: " +  strconv.Itoa(t.Offset) +  "\tlength: " +  strconv.Itoa(t.Length) +  "\tbyte: " +  strconv.Itoa(int(t.NextByte))	
 }
