@@ -1,12 +1,13 @@
 package lz77
 
 import (
-	"github.com/rodrigosemicolon/gompress/cmd/utilities"
-	"strconv"
-	"encoding/gob"
 	"encoding/binary"
-	"os"
+	"encoding/gob"
 	"fmt"
+	"os"
+	"strconv"
+
+	"github.com/rodrigosemicolon/gompress/cmd/utilities"
 )
 
 type CTuple struct {
@@ -20,7 +21,7 @@ type LZ77 struct {
 	LookAheadBufferSize int
 }
 
-func LZ77FromWindow(windowLength int) *LZ77 {
+func NewLZ77FromWindow(windowLength int) *LZ77 {
 	searchSize, lookAheadSize := utilities.SplitEvenly(windowLength)
 	return &LZ77{
 		SearchBufferSize:    searchSize,
@@ -35,30 +36,28 @@ func NewLZ77FromBuffers(searchSize, lookAheadSize int) *LZ77 {
 	}
 }
 
-func ExtractTuples(content []byte) ([]CTuple, *error){
+func ExtractTuples(content []byte) ([]CTuple, *error) {
 	return []CTuple{}, nil
 }
 
-func (t *CTuple) ToString() string{
-	return "offset: " +  strconv.Itoa(t.Offset) +  "\tlength: " +  strconv.Itoa(t.Length) +  "\tbyte: " +  strconv.Itoa(int(t.NextByte))	
+func (t *CTuple) ToString() string {
+	return "offset: " + strconv.Itoa(t.Offset) + "\tlength: " + strconv.Itoa(t.Length) + "\tbyte: " + strconv.Itoa(int(t.NextByte))
 }
 
-func WriteDstContent(path string, content []CTuple) *error{
+func WriteDstContent(path string, content []CTuple) *error {
 	f, err := os.Create(path)
-	if err != nil{
+	if err != nil {
 
 		defer f.Close()
 		fmt.Println("writedstcontent: ", content)
 		err2 := binary.Write(f, binary.LittleEndian, content)
-		
-		
-		if err2 != nil{
+
+		if err2 != nil {
 			return &err2
 		}
 	}
 	return nil
 }
-
 
 func WriteCTuplesToFile(filename string, ctuples []CTuple) error {
 	file, err := os.Create(filename)

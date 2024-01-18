@@ -1,9 +1,5 @@
 package lz77
 
-import(
-	//"github.com/rodrigosemicolon/gompress/cmd/utilities"
-)
-
 func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
 	maxLength, maxOffset := 0, 0
 	matchLength := 0
@@ -14,14 +10,12 @@ func FindLongestMatch(searchBuffer, lookAheadBuffer []byte) CTuple {
 		for k := 0; (k < len(lookAheadBuffer)) && (k+j < len(searchBuffer)); k++ {
 			if searchBuffer[j+k] == lookAheadBuffer[k] {
 				matchLength++
-				//nextByte = lookAheadBuffer[j+k]
 			} else {
 				break
 			}
 		}
 		if matchLength > 0 && matchLength >= maxLength {
 			maxLength = matchLength
-			//maxOffset = j
 			maxOffset = len(searchBuffer) - j
 
 		}
@@ -46,31 +40,25 @@ func (c *LZ77) Encode(content []byte) []CTuple {
 	LookAheadBuffer := content[:c.LookAheadBufferSize]
 	SearchBuffer := make([]byte, c.SearchBufferSize)
 	for i < len(content) {
-		//fmt.Println("\n\nsearch buffer: ", SearchBuffer, "\tlookahead buffer: ", LookAheadBuffer)
 		match := FindLongestMatch(SearchBuffer, LookAheadBuffer)
 		compressedData = append(compressedData, match)
 		moveFwd := match.Length + 1
-		
-		SearchBuffer = append(SearchBuffer, content[i : i+moveFwd]...)
+
+		SearchBuffer = append(SearchBuffer, content[i:i+moveFwd]...)
 		for len(SearchBuffer) > c.SearchBufferSize {
 			SearchBuffer = SearchBuffer[1:]
 		}
 		i = i + moveFwd
-		/*
-		if i > len(content){
+
+		if i > len(content) {
 			break
-		} else if i + c.LookAheadBufferSize > len(content){
-			diff := (i + c.LookAheadBufferSize) - len(content) -1
-			LookAheadBuffer = content[i : i+diff]
-		} else{
-			*/
-		
-		print("lookaheadbuffer: ", string(LookAheadBuffer))
-		print("content: ", string(content[i:]))
-		LookAheadBuffer = content[i : i+c.LookAheadBufferSize]
-		//LookAheadBuffer = utilities.SliceWithPadding(LookAheadBuffer, i, i + c.LookAheadBufferSize)	
-		//}
-		//fmt.Println("match:\n", match.ToString())
+		} else if i+c.LookAheadBufferSize > len(content) {
+			LookAheadBuffer = content[i:]
+
+		} else {
+			LookAheadBuffer = content[i : i+c.LookAheadBufferSize]
+		}
+
 	}
 	return compressedData
 }
